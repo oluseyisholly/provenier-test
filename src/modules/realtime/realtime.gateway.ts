@@ -52,6 +52,10 @@ export class RealtimeGateway
   ) {}
 
   afterInit(server: Server) {
+    if (!server.engine?.opts) {
+      this.logger.warn('Socket.IO engine not initialized; skipping ping config.');
+      return;
+    }
     server.engine.opts.pingInterval =
       this.configService.get<number>('realtime.pingInterval') ?? 25000;
     server.engine.opts.pingTimeout =
