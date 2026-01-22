@@ -113,7 +113,7 @@ Health check.
 OpenAPI docs are available at:
 
 ```
-http://localhost:3000/docs
+http://localhost:3000/api-docs
 ```
 
 ## Socket.IO (namespace `/realtime`)
