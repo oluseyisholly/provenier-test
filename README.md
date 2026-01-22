@@ -1,98 +1,192 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Real-time Football Match Center API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Production-ready NestJS backend for live football matches, chat rooms, real-time updates, and SSE streaming.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- REST API for live match data, match detail, and health checks
+- Socket.IO real-time updates with room-based subscriptions
+- Server-Sent Events (SSE) stream for match events
+- Background match simulator (3–5 concurrent matches) with realistic event distribution
+- Supabase Postgres persistence for match data, events, stats, and chat history
+- Redis for pub/sub, chat presence, typing indicators, and rate limiting
+- Centralized error handling, consistent response envelope, validation
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Architecture Overview
 
-## Project setup
+- **Matches Module**: REST APIs for match list and detail.
+- **Stream Module**: SSE streaming with Redis pub/sub subscription per match.
+- **Realtime Module**: Socket.IO gateway handling match subscriptions and chat rooms.
+- **Simulator Module**: Background service that ticks every simulated minute, updates data, and publishes Redis events.
+- **Supabase Integration**: Postgres persistence via `@supabase/supabase-js`.
+- **Redis Integration**: Pub/sub + ephemeral state (presence, typing, rate limit).
 
-```bash
-$ yarn install
-```
+## Setup
 
-## Compile and run the project
+### Prerequisites
+
+- Node.js 20+
+- Supabase project with Postgres
+- Redis instance
+
+### Install
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn install
 ```
 
-## Run tests
+### Configure
+
+Copy `.env.example` to `.env` and fill in values:
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+### Database schema
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Run the SQL in `scripts/schema.sql` against your Supabase database.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Run locally
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+yarn start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Docker
 
-## Resources
+```bash
+docker compose up --build
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## API Response Format
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+All REST responses:
 
-## Support
+```json
+{
+  "success": true,
+  "data": { "...": "..." },
+  "error": null
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Errors:
 
-## Stay in touch
+```json
+{
+  "success": false,
+  "data": null,
+  "error": { "code": "NOT_FOUND", "message": "...", "details": {} }
+}
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## REST Endpoints
 
-## License
+### GET `/api/matches`
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Returns live/upcoming matches (excludes `FULL_TIME`).
+
+### GET `/api/matches/:id`
+
+Returns match detail, recent events (last 20), and stats.
+
+### GET `/api/matches/:id/events/stream`
+
+SSE stream for match updates.
+
+**Query params**:
+- `since` (optional, ISO timestamp): Sends events since the given timestamp.
+
+**Example**:
+
+```bash
+curl -N "http://localhost:3000/api/matches/<matchId>/events/stream?since=2024-01-01T00:00:00.000Z"
+```
+
+### GET `/health`
+
+Health check.
+
+## Swagger
+
+OpenAPI docs are available at:
+
+```
+http://localhost:3000/api-docs
+```
+
+## Socket.IO (namespace `/realtime`)
+
+### Rooms
+
+- Match room: `match:{matchId}`
+- Chat room: `chat:{matchId}`
+
+### Client → Server
+
+- `match:subscribe` `{ matchId }`
+- `match:unsubscribe` `{ matchId }`
+- `chat:join` `{ matchId, userId, userName, tabId? }`
+- `chat:leave` `{ matchId, userId, tabId? }`
+- `chat:message` `{ matchId, userId, userName, message }`
+- `chat:typing_start` `{ matchId, userId, userName }`
+- `chat:typing_stop` `{ matchId, userId }`
+
+### Server → Client
+
+- `match:score` `{ matchId, homeScore, awayScore, minute, status }`
+- `match:event` `{ matchId, event }`
+- `match:stats` `{ matchId, stats }`
+- `chat:message` `{ matchId, message }`
+- `chat:user_joined` `{ matchId, userId, userName, userCount }`
+- `chat:user_left` `{ matchId, userId, userName?, userCount }`
+- `chat:typing` `{ matchId, userId, userName?, isTyping }`
+- `error` `{ code, message, details? }`
+
+## Chat Behavior
+
+- Presence stored with Redis TTL per match/user/tab
+- Unique user count computed from presence keys
+- Typing indicators with TTL (5s) and server-side timers
+- Rate limit: 5 messages / 10 seconds per user
+- Messages validated for length (1–280) and whitespace-only
+
+## Simulator
+
+- Runs on module init
+- 1 real second = 1 match minute (configurable)
+- Simulates match lifecycle:
+  - `NOT_STARTED` → `FIRST_HALF` → `HALF_TIME` → `SECOND_HALF` → `FULL_TIME`
+- Updates match stats and emits realistic events
+- Publishes to Redis channels:
+  - `match:{matchId}:score`
+  - `match:{matchId}:event`
+  - `match:{matchId}:stats`
+
+## Environment Variables
+
+```
+PORT=3000
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+REDIS_URL=
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+SIM_MATCH_COUNT=5
+SIM_MINUTE_MS=1000
+SOCKET_PING_INTERVAL=25000
+SOCKET_PING_TIMEOUT=20000
+```
+
+## Trade-offs / Notes
+
+- Presence uniqueness is derived by scanning presence keys; suitable for assessment scope but should be optimized for high scale.
+- SSE replay uses a `since` timestamp for simplicity.
+- Match simulator is intentionally lightweight and avoids complex ML logic.
+
+## Deployment Steps
+
+1. Configure Supabase schema and env variables.
+2. Provide Redis URL (local or managed).
+3. Build and run Docker image.
+4. Ensure port `3000` is exposed and reachable.
