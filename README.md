@@ -108,6 +108,14 @@ curl -N "http://localhost:3000/api/matches/<matchId>/events/stream?since=2024-01
 
 Health check.
 
+## Swagger
+
+OpenAPI docs are available at:
+
+```
+http://localhost:3000/docs
+```
+
 ## Socket.IO (namespace `/realtime`)
 
 ### Rooms
